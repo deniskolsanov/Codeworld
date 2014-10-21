@@ -1,22 +1,21 @@
 local Block = Class('Block')
 
 function Block:initialize(x, y, w, h)
-  local o = {}
-  o.b = love.physics.newBody(world, x, y, "dynamic")
-  o.s = love.physics.newRectangleShape(0, 0, w, h, 0)
-  o.f = love.physics.newFixture(o.b, o.s)
-  o.b:setUserData({type = "Block", body = o.b, shape = o.s, fixture = o.f, code = "function init()\n  --self.x = 400\nend\n\nfunction update()\nend"})
-  self.o = o
+  local body = love.physics.newBody(world, x, y, "dynamic")
+  local shape = love.physics.newRectangleShape(0, 0, w, h, 0)
+  local fixture = love.physics.newFixture(body, shape)
+  body:setUserData({type = "Block", body = body, shape = shape, fixture = fixture,
+	code = "function init()\n  --self.x = 400\nend\n\nfunction update()\nend"})
 end
 
 function Block:update(dt)
 	body = world:getBodyList()
-		for i = 1, #body do
-			local temp = body[i]:getUserData()
-			if temp and (not editor.frame:GetVisible()) and temp.code then
-				Editor:runCode( body[i], 'update' )
-			end
+	for i = 1, #body do
+		local temp = body[i]:getUserData()
+		if temp and (not editor.frame:GetVisible()) and temp.code then
+			Editor:runCode( body[i], 'update' )
 		end
+	end
 end
 
 function Block:draw()

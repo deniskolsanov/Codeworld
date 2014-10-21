@@ -38,12 +38,9 @@ function Editor:initialize()
   textinput:SetMultiline(true)
   textinput:SetHeight(200)
   textinput:SetText("no code!")
-  
+	
   self.frame = frame
   self.textinput = textinput
-  
-  self.exit = false
-  self.visible = false
 end
 
 function Editor:runCode( body, state )
@@ -69,6 +66,7 @@ function Editor:runCode( body, state )
 	if type(env.self.y) == "number" then body:setY(env.self.y) end
 	if type(env.self.angle) == "number" then body:setAngle(env.self.angle) end
 	if type(env.self.angularVelocity) == "number" then body:setAngularVelocity(env.self.angularVelocity) end
+	body:setAwake( true )
 	return 'Ok'
 end
 

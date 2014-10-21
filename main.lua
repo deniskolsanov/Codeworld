@@ -45,7 +45,6 @@ end
 
 function love.draw(dt)
   love.graphics.setBackgroundColor(198, 198, 198, 150)
-  loveframes.draw()
 end
 
 function love.mousepressed(x, y, button)

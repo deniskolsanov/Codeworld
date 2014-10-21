@@ -444,6 +444,7 @@ end
 	- desc: called when the player presses a key
 --]]---------------------------------------------------------
 function newobject:keypressed(key, isrepeat)
+
 	local state = loveframes.state
 	local selfstate = self.state
 	
