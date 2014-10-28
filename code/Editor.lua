@@ -44,7 +44,8 @@ function Editor:initialize()
 end
 
 function Editor:runCode( body, state )
-	code = body:getUserData().code
+	local data = body:getUserData()
+	local code = data.code
 	env.self = { x = body:getX(), y = body:getY(), angle = body:getAngle(),
 		angularVelocity = body:getAngularVelocity(),
 		destroy = function() body:destroy() body = nil end,
@@ -52,10 +53,11 @@ function Editor:runCode( body, state )
 		applyForce = function(x,y) body:applyForce( x, y ) end,
 		applyLinearImpulse = function(x,y) body:applyLinearImpulse( x, y ) end,
 		applyTorque = function(q) body:applyTorque( q ) end
-		}
-  local untrusted_function, message = loadstring(code..' '..state..'()')
-  if not untrusted_function then return message end
-  setfenv( untrusted_function, env )
+	}
+	if data.type == "Turret" then env.self.aim = data.aim end
+  	local untrusted_function, message = loadstring(code..' '..state..'()')
+  	if not untrusted_function then return message end
+  	setfenv( untrusted_function, env )
 	message = pcall( untrusted_function )
 	if not message then return "code don't work :(" end
 	if (not type(env) == "table") or (not type(env.self) == "table") then
@@ -66,6 +68,8 @@ function Editor:runCode( body, state )
 	if type(env.self.y) == "number" then body:setY(env.self.y) end
 	if type(env.self.angle) == "number" then body:setAngle(env.self.angle) end
 	if type(env.self.angularVelocity) == "number" then body:setAngularVelocity(env.self.angularVelocity) end
+	if data.type == "Turret" and type(env.self.aim) == "string" then data.aim = env.self.aim end
+	body:setUserData(data)
 	body:setAwake( true )
 	return 'Ok'
 end
@@ -81,13 +85,42 @@ function Editor:setVisible(visible)
 	end
 end
 
-function Editor:update(dt)  
+function Editor:update(dt)
+	body = world:getBodyList()
+	for i = 1, #body do
+		local temp = body[i]:getUserData()
+		if temp and (not editor.frame:GetVisible()) and temp.code then
+			Editor:runCode( body[i], 'update' )
+		end
+	end
 end
 
 function Editor:draw()
 end
 
-function Editor:Editorpressed(x, y, button)
+function Editor:editorpressed(x, y, button)
+	local last = editor.frame:GetVisible()
+	if last and
+		x >= editor.frame:GetX() and y >= editor.frame:GetY() and
+		x <= editor.frame:GetX() + editor.frame:GetWidth() and y <= editor.frame:GetY() + editor.frame:GetHeight() then
+    editor.frame:SetVisible(true)
+	else
+		editor.frame:SetVisible(false)
+		body = world:getBodyList()
+		for i = 1, #body do
+			local temp = body[i]:getUserData()
+			if temp and temp.code and temp.fixture:testPoint( x, y ) then
+				local x, y = temp.body:getPosition()
+				editor.frame:SetPos(x, y, false)
+				editor.body = body[i]
+				editor.frame:SetVisible(true)
+				break
+			end
+		end
+	end
+	if not editor.frame:GetVisible() == last then
+		editor:setVisible( editor.frame:GetVisible() )
+	end
 end
 
 return Editor

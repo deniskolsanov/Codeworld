@@ -6,7 +6,7 @@ function GameState:enter(previous)
   --world:setCallbacks(beginContact, endContact, preSolve, postSolve)
   
   editor = Editor:new()
-  mouse = Mouse:new()
+  turret = Turret:new(500,400)
   block = Block:new(50, 50, 32, 32)
 	player = Player:new(400,400)
 	
@@ -29,9 +29,10 @@ function GameState:update(dt)
     world:update(dt)
   end
   
-  mouse:update(dt)
+  turret:update(dt)
   block:update(dt)
-	Player:update(dt)
+	player:update(dt)
+	editor:update(dt)
 end
 
 function GameState:draw()
@@ -44,17 +45,18 @@ end
 
 function GameState:mousepressed(x,y, button)
   block:mousepressed(x, y, button)
+	editor:editorpressed(x, y, button)
 end
 
 function GameState:mousereleased(x,y, button)
 end
 
 function GameState:keypressed(key)
-	Player:keypressed(key)
+	player:keypressed(key)
 end
 
 function GameState:keyreleased(key)
-	Player:keyreleased(key)
+	player:keyreleased(key)
 end
 
 function beginContact(a, b, coll)

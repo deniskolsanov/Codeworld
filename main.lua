@@ -12,7 +12,7 @@ GameState   = require "code.states.GameState"
 
 Block       = require "code.Block"
 Player      = require "code.Player"
-Mouse       = require "code.Mouse"
+Turret      = require "code.Turret"
 Editor      = require "code.Editor"
 
 
